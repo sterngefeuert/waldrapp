@@ -12,6 +12,7 @@ public class PathOnPlane : MonoBehaviour
     public GameObject objectToAnimate;
     public float speed = 5.0f; // Units per second
     public int sampleRate = 1; // Use every 'sampleRate'th point from the pathPoints list
+    public bool animate = true; 
 
     void Start()
     {
@@ -23,10 +24,12 @@ public class PathOnPlane : MonoBehaviour
         }
     }
 
+
+
     void ReadCoordinatesAndCreatePath()
     {
         CoordinateList coordinateList = JsonUtility.FromJson<CoordinateList>(jsonFile.text);
-        
+
         for (int i = 0; i < coordinateList.locations.Length; i += sampleRate)
         {
             Coordinates coordinates = coordinateList.locations[i];
@@ -60,30 +63,35 @@ public class PathOnPlane : MonoBehaviour
         float y = latitude * scale;
         return new Vector3(x, 0, y);
     }
-
     private IEnumerator MoveAlongPath()
     {
-        for (int i = 0; i < pathPoints.Count - 1; i++)
+        while (animate) // Loop indefinitely
         {
-            Vector3 startPoint = pathPoints[i];
-            Vector3 endPoint = pathPoints[i + 1];
-            
-            // Rotate to face the next point
-            Vector3 direction = (endPoint - startPoint).normalized;
-            if (direction != Vector3.zero)
+            for (int i = 0; i < pathPoints.Count - 1; i++)
             {
-                Quaternion lookRotation = Quaternion.LookRotation(direction);
-                objectToAnimate.transform.rotation = lookRotation;
-            }
-            
-            // Move to the next point
-            while (objectToAnimate.transform.position != endPoint)
-            {
-                objectToAnimate.transform.position = Vector3.MoveTowards(objectToAnimate.transform.position, endPoint, speed * Time.deltaTime);
-                yield return null;
-            }
-        }
+                Vector3 startPoint = pathPoints[i];
+                Vector3 endPoint = pathPoints[i + 1];
 
-        // Optionally loop or do something else once the path is complete
+                // Rotate to face the next point
+                Vector3 direction = (endPoint - startPoint).normalized;
+                if (direction != Vector3.zero)
+                {
+                    Quaternion lookRotation = Quaternion.LookRotation(direction);
+                    objectToAnimate.transform.rotation = lookRotation;
+                }
+
+                // Move to the next point
+                while (Vector3.Distance(objectToAnimate.transform.position, endPoint) > 0.01f) // Use a threshold to avoid floating point precision issues
+                {
+                    objectToAnimate.transform.position = Vector3.MoveTowards(objectToAnimate.transform.position, endPoint, speed * Time.deltaTime);
+                    yield return null; // Ensure this happens smoothly over time
+                }
+            }
+
+            // Reset to start position before looping again, if needed
+            // objectToAnimate.transform.position = pathPoints[0];
+            // Alternatively, just let it loop without this line if not needed
+        }
     }
+
 }
