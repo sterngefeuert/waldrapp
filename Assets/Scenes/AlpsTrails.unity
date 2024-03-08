@@ -347,7 +347,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1446339982628673801, guid: 4972675bbcc6d48619270707583b25b9, type: 3}
       propertyPath: speed
-      value: 50
+      value: 150
       objectReference: {fileID: 0}
     - target: {fileID: 1446339982628673801, guid: 4972675bbcc6d48619270707583b25b9, type: 3}
       propertyPath: jsonFile
