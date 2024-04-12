@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
+using TMPro;
 
 public class PathOnPlane : MonoBehaviour
 {
@@ -14,12 +15,17 @@ public class PathOnPlane : MonoBehaviour
     public int sampleRate = 1; // Use every 'sampleRate'th point from the pathPoints list
     public bool animate = true; 
 
+    public TextMeshPro birdtext;
+
+    private CoordinateList coordinateList;
+
     void Start()
     {
         ReadCoordinatesAndCreatePath();
 
         if (objectToAnimate != null)
         {
+            objectToAnimate.transform.position = pathPoints[0];
             StartCoroutine(MoveAlongPath());
         }
     }
@@ -28,7 +34,7 @@ public class PathOnPlane : MonoBehaviour
 
     void ReadCoordinatesAndCreatePath()
     {
-        CoordinateList coordinateList = JsonUtility.FromJson<CoordinateList>(jsonFile.text);
+        coordinateList = JsonUtility.FromJson<CoordinateList>(jsonFile.text);
 
         for (int i = 0; i < coordinateList.locations.Length; i += sampleRate)
         {
@@ -69,15 +75,21 @@ public class PathOnPlane : MonoBehaviour
         {
             for (int i = 0; i < pathPoints.Count - 1; i++)
             {
+
+                birdtext.text = coordinateList.locations[i].latitude.ToString() + ", " + coordinateList.locations[i].longitude.ToString();
+
                 Vector3 startPoint = pathPoints[i];
                 Vector3 endPoint = pathPoints[i + 1];
+
+
 
                 // Rotate to face the next point
                 Vector3 direction = (endPoint - startPoint).normalized;
                 if (direction != Vector3.zero)
                 {
                     Quaternion lookRotation = Quaternion.LookRotation(direction);
-                    objectToAnimate.transform.rotation = lookRotation;
+
+                    //objectToAnimate.transform.rotation = lookRotation;
                 }
 
                 // Move to the next point
