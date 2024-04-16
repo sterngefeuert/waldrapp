@@ -11,7 +11,7 @@ public class PathOnPlane : MonoBehaviour
     public float scale = 1.0f; // Scale factor for adjusting the spacing on the flat surface
     public List<Vector3> pathPoints = new List<Vector3>(); // This will be populated from JSON
     public GameObject objectToAnimate;
-    public float speed = 5.0f; // Units per second
+    public float speed = 0.1f; // Units per second
     public int sampleRate = 1; // Use every 'sampleRate'th point from the pathPoints list
     public bool animate = true; 
 
@@ -35,6 +35,12 @@ public class PathOnPlane : MonoBehaviour
     void ReadCoordinatesAndCreatePath()
     {
         coordinateList = JsonUtility.FromJson<CoordinateList>(jsonFile.text);
+        // Extract the name of the JSON file
+        string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(jsonFile.name);
+        string[] splitFileName = fileNameWithoutExtension.Split('_');
+        Debug.Log(splitFileName);
+
+        birdtext.text = splitFileName[1];
 
         for (int i = 0; i < coordinateList.locations.Length; i += sampleRate)
         {
@@ -71,12 +77,13 @@ public class PathOnPlane : MonoBehaviour
     }
     private IEnumerator MoveAlongPath()
     {
+        Debug.Log("Speed: " + speed);
         while (animate) // Loop indefinitely
         {
             for (int i = 0; i < pathPoints.Count - 1; i++)
             {
 
-                birdtext.text = coordinateList.locations[i].latitude.ToString() + ", " + coordinateList.locations[i].longitude.ToString();
+                //birdtext.text = coordinateList.locations[i].latitude.ToString() + ", " + coordinateList.locations[i].longitude.ToString();
 
                 Vector3 startPoint = pathPoints[i];
                 Vector3 endPoint = pathPoints[i + 1];
